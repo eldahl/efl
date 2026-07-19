@@ -37,7 +37,7 @@ int main(int argv, char **argc) {
 
     int result = scanf("%1023s", inputBuffer);
     if(result < 1) {
-      printf("No input\n");
+      printf("No input");
       continue;
     }
     int readChars = strlen(inputBuffer);

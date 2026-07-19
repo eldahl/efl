@@ -14,6 +14,7 @@
 
 typedef struct TreeNode {
     char* data;
+    struct TreeNode* parent;
     struct TreeNode** children;
     int child_count;
     int capacity;
@@ -28,7 +29,7 @@ TreeNode* create_node(const char* data) {
     new_node->data = strdup(data);
     if(!new_node->data) {
         free(new_node);
-        printf("Failed to allocate data field on TreeNode.");
+        printf("Failed to allocate data field on TreeNode.\n");
         return NULL;
     }
 
@@ -39,7 +40,10 @@ TreeNode* create_node(const char* data) {
 }
 
 void free_tree(TreeNode* root) {
-    if (!root) return;
+    if (!root) {
+        printf("Missing argument for free_tree.\n");
+        return;
+    }
 
     // Free all children first
     for (int i = 0; i < root->child_count; i++) {
@@ -53,7 +57,10 @@ void free_tree(TreeNode* root) {
 }
 
 void add_child(TreeNode* parent, TreeNode* child) {
-    if (!parent || !child) return;
+    if (!parent || !child) {
+        printf("Missing argument for add_child.\n");
+        return;
+    }
 
     // When the array is full, expand its size
     if (parent->child_count >= parent->capacity) {
@@ -66,7 +73,10 @@ void add_child(TreeNode* parent, TreeNode* child) {
         parent->children = temp;
     }
 
-    // Insert child and increment
+    // Set parent of child node
+    child->parent = parent;
+
+    // Insert child, assign id, and increment
     parent->children[parent->child_count] = child;
     parent->child_count++;
 }
