@@ -12,6 +12,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+// OPERATOR TYPE CONSTANTS
+const int OPERATOR_TYPE_ADDITION = 0;
+const int OPERATOR_TYPE_SUBTRACT = 1;
+const int OPERATOR_TYPE_MULTIPLY = 2;
+const int OPERATOR_TYPE_DIVISION = 3;
+
+// STATEMENT TYPE CONSTANTS
+const int STATEMENT_TYPE_OPERATOR = 0;
+const int STATEMENT_TYPE_KEYWORD = 1;
+const int STATEMENT_TYPE_FUNCTION = 2;
+
+typedef struct {
+    int statement_type;
+    int statement_sub_type;
+    char* statement_identifier;
+} Statement;
+
 typedef struct {
   int line;
   int index;
@@ -20,6 +38,7 @@ typedef struct {
 typedef struct TreeNode {
     TokenPosition start_paren;
     TokenPosition close_paren;
+    Statement statement;
     struct TreeNode* parent;
     struct TreeNode** children;
     int child_count;
@@ -33,6 +52,8 @@ TreeNode* create_node() {
 
     new_node->start_paren = (TokenPosition){ -1, -1 };
     new_node->close_paren = (TokenPosition){ -1, -1 };
+
+    new_node->statement = (Statement) { -1, -1, NULL};
 
     new_node->children = NULL;
     new_node->child_count = 0;

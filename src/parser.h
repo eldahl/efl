@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ctype.h>
 #include <stdio.h>
 
 #include "tree.h"
@@ -19,10 +20,52 @@ void Parse(char **buffer, int BUFFER_SIZE) {
   int numOfStartingParentheses = 0;
   int numOfClosingParentheses = 0;
 
+  // Operator/Keyword detection
+  int lookForKeywordOrOperator = 0;
+
+  // Arguments detection
+  int lookForArguments = 0;
+
   // Finding scopes
   for (int i = 0; i < BUFFER_SIZE; i++) {
     char c = (*buffer)[i];
 
+    if (lookForKeywordOrOperator) {
+      // Operators
+      if (c == '+') {
+        currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_ADDITION, "Addition" };
+      }
+      else if (c == '-') {
+        currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_SUBTRACT, "Subtraction" };
+      }
+      else if (c == '*') {
+        currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_MULTIPLY, "Multiplication" };
+      }
+      else if (c == '/') {
+        currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_DIVISION, "Division" };
+      }
+
+      lookForArguments = 1;
+      lookForKeywordOrOperator = 0;
+      continue;
+    }
+
+    if (lookForArguments) {
+      if (c == '(') {
+        goto scopeDetection;
+      }
+
+      if (c == ' ') {
+        continue;
+      }
+
+      if (isdigit(c)) {
+        
+      }
+
+    }
+
+scopeDetection:
     if (c == '(') {
       // Increment number of found starting parentheses
       numOfStartingParentheses++;
@@ -38,6 +81,11 @@ void Parse(char **buffer, int BUFFER_SIZE) {
 
       // New scope
       currentScope = newScope;
+
+      // Start looking for keywords/operators
+      lookForKeywordOrOperator = 1;
+
+      continue;
     }
     else if (c == ')') {
       numOfClosingParentheses++;
@@ -45,6 +93,8 @@ void Parse(char **buffer, int BUFFER_SIZE) {
       TokenPosition closeParenthesis = { 0, i };
 
       currentScope->close_paren = closeParenthesis;
+
+      //printf("parentheses pair: %d, %d\n", currentScope->start_paren.index, closeParenthesis.index);
 
       // Case: There are fewer closing the starting parentheses, go a scope up.
       if(numOfClosingParentheses < numOfStartingParentheses) {
@@ -63,9 +113,10 @@ void Parse(char **buffer, int BUFFER_SIZE) {
         numOfStartingParentheses--;
       }
 
-      printf("parentheses pair: %d, %d\n", currentScope->start_paren.index, i);
+      continue;
     } else if (c == '\0') {
       printf("End of buffer\n");
+      return;
     }
   }
   print_tree(base, 0);
