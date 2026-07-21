@@ -12,26 +12,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct {
+  int line;
+  int index;
+} TokenPosition;
+
 typedef struct TreeNode {
-    char* data;
+    TokenPosition start_paren;
+    TokenPosition close_paren;
     struct TreeNode* parent;
     struct TreeNode** children;
     int child_count;
     int capacity;
 } TreeNode;
 
-TreeNode* create_node(const char* data) {
+TreeNode* create_node() {
     // Allocate memory
     TreeNode* new_node = (TreeNode*)malloc(sizeof(TreeNode));
     if (!new_node) return NULL;
 
-    // string copy, allocates memory
-    new_node->data = strdup(data);
-    if(!new_node->data) {
-        free(new_node);
-        printf("Failed to allocate data field on TreeNode.\n");
-        return NULL;
-    }
+    new_node->start_paren = (TokenPosition){ -1, -1 };
+    new_node->close_paren = (TokenPosition){ -1, -1 };
 
     new_node->children = NULL;
     new_node->child_count = 0;
@@ -52,7 +53,6 @@ void free_tree(TreeNode* root) {
 
     // Free the treenodes data and itself
     free(root->children);
-    free(root->data);
     free(root);
 }
 
@@ -88,7 +88,7 @@ void print_tree(TreeNode* root, int depth) {
     for (int i = 0; i < depth; i++) {
         printf("  ");
     }
-    printf("|-- %s\n", root->data);
+    printf("|-- %d-%d\n", root->start_paren.index, root->close_paren.index);
 
     // Recursive printing
     for (int i = 0; i < root->child_count; i++) {

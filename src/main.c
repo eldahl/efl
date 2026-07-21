@@ -20,7 +20,6 @@ To start out, it seems like the path of least resistance is the Lisp way.
 #include <stdlib.h>
 #include <string.h>
 
-#include "tree.h"
 #include "parser.h"
 
 int main(int argv, char **argc) {
