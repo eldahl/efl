@@ -44,6 +44,9 @@ void Parse(char **buffer, int BUFFER_SIZE) {
       else if (c == '/') {
         currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_DIVISION, "Division" };
       }
+      else {
+        goto scopeDetection;
+      }
 
       lookForArguments = 1;
       lookForKeywordOrOperator = 0;
@@ -51,16 +54,11 @@ void Parse(char **buffer, int BUFFER_SIZE) {
     }
 
     if (lookForArguments) {
-      if (c == '(') {
-        goto scopeDetection;
-      }
-
-      if (c == ' ') {
-        continue;
-      }
-
       if (isdigit(c)) {
         
+      }
+      else {
+        goto scopeDetection;
       }
 
     }
