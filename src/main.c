@@ -24,7 +24,7 @@ To start out, it seems like the path of least resistance is the Lisp way.
 
 int main(int argv, char **argc) {
   int evaluating = 1;
-  int INPUT_BUFFER_SIZE = 1024;
+  size_t INPUT_BUFFER_SIZE = 1024;
 
   char *inputBuffer = (char *)malloc(INPUT_BUFFER_SIZE * sizeof(char));
   if (inputBuffer == NULL) {
@@ -33,13 +33,11 @@ int main(int argv, char **argc) {
   }
   
   while (evaluating == 1) {
-
-    int result = scanf("%1023s", inputBuffer);
-    if(result < 1) {
-      printf("No input\n");
-      continue;
-    }
+    
+    getline(&inputBuffer, &INPUT_BUFFER_SIZE, stdin);
     int readChars = strlen(inputBuffer);
+    
+    printf("chars: %d", readChars);
     printf("\n");
 
     Parse(&inputBuffer, readChars);
