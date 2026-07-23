@@ -14,15 +14,18 @@
 #include <string.h>
 
 // OPERATOR TYPE CONSTANTS
+const int OPERATOR_TYPE_NULL = -1;
 const int OPERATOR_TYPE_ADDITION = 0;
 const int OPERATOR_TYPE_SUBTRACT = 1;
 const int OPERATOR_TYPE_MULTIPLY = 2;
 const int OPERATOR_TYPE_DIVISION = 3;
 
 // STATEMENT TYPE CONSTANTS
-const int STATEMENT_TYPE_OPERATOR = 0;
-const int STATEMENT_TYPE_KEYWORD = 1;
-const int STATEMENT_TYPE_FUNCTION = 2;
+const int STATEMENT_TYPE_NULL = -1;
+const int STATEMENT_TYPE_SCOPE = 0;
+const int STATEMENT_TYPE_OPERATOR = 1;
+const int STATEMENT_TYPE_KEYWORD = 2;
+const int STATEMENT_TYPE_FUNCTION = 3;
 
 typedef struct {
     int statement_type;
@@ -36,6 +39,7 @@ typedef struct {
 } TokenPosition;
 
 // ARGUMENT TYPE CONSTANTS
+const int ARGUMENT_TYPE_NULL = -1;
 const int ARGUMENT_TYPE_NUMBER = 0;
 const int ARGUMENT_TYPE_STRING = 1;
 const int ARGUMENT_TYPE_FUNCTION = 2;
@@ -46,17 +50,20 @@ typedef struct {
     char* argument_identifier;
 } Argument;
 
-typedef struct TreeNode {
+typedef struct ParsingTreeNode {
     TokenPosition start_paren;
     TokenPosition close_paren;
     Statement statement;
     Argument arg_lhs;
     Argument arg_rhs;
-    struct TreeNode* parent;
-    struct TreeNode** children;
+    struct ParsingTreeNode* parent;
+    struct ParsingTreeNode** children;
     int child_count;
     int capacity;
-} TreeNode;
+    // For parsing
+    int lookForKeywordOrOperator;
+    int lookForArguments;
+} ParsingTreeNode;
 
 char* argument_as_number(int _number) {
     char* number = malloc(sizeof(int));
@@ -81,9 +88,9 @@ char* argument_as_string(char* _char_array, int _char_array_size) {
     return string;
 }
 
-TreeNode* create_node() {
+ParsingTreeNode* create_node() {
     // Allocate memory
-    TreeNode* new_node = (TreeNode*)malloc(sizeof(TreeNode));
+    ParsingTreeNode* new_node = (ParsingTreeNode*)malloc(sizeof(ParsingTreeNode));
     if (!new_node) return NULL;
 
     new_node->start_paren = (TokenPosition){ -1, -1 };
@@ -94,13 +101,16 @@ TreeNode* create_node() {
     new_node->arg_lhs = (Argument) { -1, NULL, NULL};
     new_node->arg_rhs = (Argument) { -1, NULL, NULL};
 
+    new_node->lookForKeywordOrOperator = 0;
+    new_node->lookForArguments = 0;
+
     new_node->children = NULL;
     new_node->child_count = 0;
     new_node->capacity = 0;
     return new_node;
 }
 
-void free_tree(TreeNode* root) {
+void free_tree(ParsingTreeNode* root) {
     if (!root) {
         printf("Missing argument for free_tree.\n");
         return;
@@ -121,7 +131,7 @@ void free_tree(TreeNode* root) {
     free(root);
 }
 
-void add_child(TreeNode* parent, TreeNode* child) {
+void add_child(ParsingTreeNode* parent, ParsingTreeNode* child) {
     if (!parent || !child) {
         printf("Missing argument for add_child.\n");
         return;
@@ -130,7 +140,7 @@ void add_child(TreeNode* parent, TreeNode* child) {
     // When the array is full, expand its size
     if (parent->child_count >= parent->capacity) {
         parent->capacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
-        TreeNode** temp = (TreeNode**)realloc(parent->children, parent->capacity * sizeof(TreeNode*));
+        ParsingTreeNode** temp = (ParsingTreeNode**)realloc(parent->children, parent->capacity * sizeof(ParsingTreeNode*));
         if (!temp) {
             fprintf(stderr, "Error: Could not allocate memory.\n");
             return;
@@ -146,7 +156,7 @@ void add_child(TreeNode* parent, TreeNode* child) {
     parent->child_count++;
 }
 
-void print_tree(TreeNode* root, int depth) {
+void print_tree(ParsingTreeNode* root, int depth) {
     if (!root) return;
 
     // Indention

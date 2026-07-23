@@ -8,31 +8,25 @@
 TokenPosition GetClosingParenthesis(char **buffer, int BUFFER_SIZE, int START_POSITION,
                                     TokenPosition token);
 
-void Parse(char **buffer, int BUFFER_SIZE) {
+ParsingTreeNode* Parse(char **buffer, int BUFFER_SIZE) {
 
   // Base node where the program context starts
-  TreeNode *base = create_node();
+  ParsingTreeNode *base = create_node();
   // Set base node to parent to itself
   base->parent = base;
+  base->statement = (Statement) { STATEMENT_TYPE_SCOPE, OPERATOR_TYPE_NULL, "Main Context" };
 
   // Keep track of current scope
-  TreeNode *currentScope = base;
+  ParsingTreeNode *currentScope = base;
   int numOfStartingParentheses = 0;
   int numOfClosingParentheses = 0;
-
-  // Operator/Keyword detection
-  int lookForKeywordOrOperator = 0;
-
-  // Arguments detection
-  int lookForArguments = 0;
-  int foundLHS = 0;
 
   // Finding scopes
   for (int i = 0; i < BUFFER_SIZE; i++) {
     char c = (*buffer)[i];
     //printf("%d: %c\n", i, c);
 
-    if (lookForKeywordOrOperator) {
+    if (currentScope->lookForKeywordOrOperator) {
       // Operators
       if (c == '+') {
         currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_ADDITION, "Addition" };
@@ -46,16 +40,21 @@ void Parse(char **buffer, int BUFFER_SIZE) {
       else if (c == '/') {
         currentScope->statement = (Statement) { STATEMENT_TYPE_OPERATOR, OPERATOR_TYPE_DIVISION, "Division" };
       }
+      else if (c == ' ') {
+        currentScope->statement = (Statement) { STATEMENT_TYPE_SCOPE, OPERATOR_TYPE_NULL, "Scope" };
+      }
       else {
+        currentScope->lookForArguments = 1;
+        currentScope->lookForKeywordOrOperator = 0;
         goto scopeDetection;
       }
 
-      lookForArguments = 1;
-      lookForKeywordOrOperator = 0;
+      currentScope->lookForArguments = 1;
+      currentScope->lookForKeywordOrOperator = 0;
       continue;
     }
 
-    if (lookForArguments) {
+    if (currentScope->lookForArguments) {
       if (isdigit(c)) {
         // Extract characters of number and find the last digit of the number.
         int lastIdx = 0; int lastDigit = 0; char digitBuffer[1024]; 
@@ -72,17 +71,21 @@ void Parse(char **buffer, int BUFFER_SIZE) {
         // printf("digit buffer: %s\n", digitBuffer);
         // printf("number: %d\n", number);
         
-        if(!foundLHS) {
+        // LHS
+        if(currentScope->arg_lhs.argument_type == ARGUMENT_TYPE_NULL) {
           currentScope->arg_lhs.argument_type = ARGUMENT_TYPE_NUMBER;
           currentScope->arg_lhs.argument_identifier = "Number";
           currentScope->arg_lhs.argument_data = argument_as_number(number);
-          foundLHS = 1;
         }
-        else {
+        // RHS
+        else if (currentScope->arg_rhs.argument_type == ARGUMENT_TYPE_NULL) {
           currentScope->arg_rhs.argument_type = ARGUMENT_TYPE_NUMBER;
           currentScope->arg_rhs.argument_identifier = "Number";
           currentScope->arg_rhs.argument_data = argument_as_number(number);
-          foundLHS = 0;
+          currentScope->lookForArguments = 0;
+        }
+        else {
+          printf("arg_lhs & arg_rhs is non-NULL when they shouldn't be.\n");
         }
 
         // Jump character reading progress to the end of the number
@@ -99,11 +102,29 @@ scopeDetection:
 
       // Increment number of found starting parentheses
       numOfStartingParentheses++;
-      
+
+      // if (lookForKeywordOrOperator) {
+      //   currentScope->statement = (Statement) { STATEMENT_TYPE_SCOPE, OPERATOR_TYPE_NULL, "Scope" };
+      //   lookForKeywordOrOperator = 0;
+      // }
+
+      if (currentScope->lookForArguments) {
+        if (currentScope->arg_lhs.argument_type == ARGUMENT_TYPE_NULL) {
+          currentScope->arg_lhs = (Argument) { ARGUMENT_TYPE_FUNCTION, NULL, "Scope" };
+        }
+        else if (currentScope->arg_rhs.argument_type == ARGUMENT_TYPE_NULL) {
+          currentScope->arg_rhs = (Argument) { ARGUMENT_TYPE_FUNCTION, NULL, "Scope" };
+          currentScope->lookForArguments = 0;
+        }
+        else {
+          printf("arg_lhs & arg_rhs is non-NULL when they shouldn't be.\n");
+        }
+      }
+
       TokenPosition startParenthesis = { 0, i };
 
       // Create new scope for the found parenthesis
-      TreeNode *newScope = create_node();
+      ParsingTreeNode *newScope = create_node();
       newScope->start_paren = startParenthesis;
 
       // Add new scope to base
@@ -113,7 +134,7 @@ scopeDetection:
       currentScope = newScope;
 
       // Start looking for keywords/operators
-      lookForKeywordOrOperator = 1;
+      currentScope->lookForKeywordOrOperator = 1;
 
       continue;
     }
@@ -125,6 +146,11 @@ scopeDetection:
       currentScope->close_paren = closeParenthesis;
 
       //printf("parentheses pair: %d, %d\n", currentScope->start_paren.index, closeParenthesis.index);
+
+      // Set statement for scope to be a non-behavioured scope if no statement has been set when reaching the closing parenthesis.
+      if (currentScope->statement.statement_type == STATEMENT_TYPE_NULL) {
+        currentScope->statement = (Statement) { STATEMENT_TYPE_SCOPE, OPERATOR_TYPE_NULL, "Scope" };
+      }
 
       // Case: There are fewer closing the starting parentheses, go a scope up.
       if(numOfClosingParentheses < numOfStartingParentheses) {
@@ -142,14 +168,14 @@ scopeDetection:
         numOfClosingParentheses--;
         numOfStartingParentheses--;
       }
-
       continue;
     }
     else if (c == '\0') {
       printf("End of buffer\n");
-      return;
+      return NULL;
     }
   }
   print_tree(base, 0);
+  return base;
 }
 
