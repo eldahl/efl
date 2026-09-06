@@ -20,6 +20,7 @@ To start out, it seems like the path of least resistance is the Lisp way.
 #include <stdlib.h>
 #include <string.h>
 
+#include "eval_tree.h"
 #include "tree.h"
 #include "parser.h"
 #include "executor.h"
@@ -49,7 +50,8 @@ int main(int argv, char **argc) {
     }
 
     ParsingTreeNode* syntax_tree = Parse(&inputBuffer, readChars);
-    Evaluate(syntax_tree);
+    EvalTreeNode* eval_tree = et_create_node();
+    Evaluate(eval_tree, syntax_tree);
 
     // Zero the input buffer
     memset(inputBuffer, 0, INPUT_BUFFER_SIZE * sizeof(char));

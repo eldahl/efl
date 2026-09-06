@@ -14,7 +14,7 @@ ParsingTreeNode* Parse(char **buffer, int BUFFER_SIZE) {
   ParsingTreeNode *base = create_node();
   // Set base node to parent to itself
   base->parent = base;
-  base->statement = (Statement) { STATEMENT_TYPE_SCOPE, OPERATOR_TYPE_NULL, "Main Context" };
+  base->statement = (Statement) { STATEMENT_TYPE_SCOPE, OPERATOR_TYPE_NULL, argument_from_string("Main Context", 12) };
 
   // Keep track of current scope
   ParsingTreeNode *currentScope = base;
@@ -70,18 +70,18 @@ ParsingTreeNode* Parse(char **buffer, int BUFFER_SIZE) {
         // printf("%d - %d\n", i, lastDigit);
         // printf("digit buffer: %s\n", digitBuffer);
         // printf("number: %d\n", number);
-        
+
         // LHS
         if(currentScope->arg_lhs.argument_type == ARGUMENT_TYPE_NULL) {
           currentScope->arg_lhs.argument_type = ARGUMENT_TYPE_NUMBER;
           currentScope->arg_lhs.argument_identifier = "Number";
-          currentScope->arg_lhs.argument_data = argument_as_number(number);
+          currentScope->arg_lhs.argument_data = argument_from_number(number);
         }
         // RHS
         else if (currentScope->arg_rhs.argument_type == ARGUMENT_TYPE_NULL) {
           currentScope->arg_rhs.argument_type = ARGUMENT_TYPE_NUMBER;
           currentScope->arg_rhs.argument_identifier = "Number";
-          currentScope->arg_rhs.argument_data = argument_as_number(number);
+          currentScope->arg_rhs.argument_data = argument_from_number(number);
           currentScope->lookForArguments = 0;
         }
         else {
