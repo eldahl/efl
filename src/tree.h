@@ -48,6 +48,7 @@ typedef struct {
     int argument_type;
     char* argument_data;
     char* argument_identifier;
+    struct ParsingTreeNode* argument_node;
 } Argument;
 
 typedef struct ParsingTreeNode {
