@@ -21,10 +21,9 @@ To start out, it seems like the path of least resistance is the Lisp way.
 #include <string.h>
 
 #include "eval_tree.h"
-#include "tree.h"
-#include "parser.h"
 #include "executor.h"
-
+#include "parser.h"
+#include "tree.h"
 
 int main(int argv, char **argc) {
   int evaluating = 1;
@@ -35,29 +34,31 @@ int main(int argv, char **argc) {
     printf("Memory allocation failed!\n");
     return 1;
   }
-  
+
   while (evaluating == 1) {
-    
+
     getline(&inputBuffer, &INPUT_BUFFER_SIZE, stdin);
     int readChars = strlen(inputBuffer);
-    
+
     printf("chars: %d", readChars);
     printf("\n");
-    
+
     if (inputBuffer[0] == 'e' && inputBuffer[1] == 'x' &&
         inputBuffer[2] == 'i' && inputBuffer[3] == 't') {
       evaluating = 0;
     }
 
-    ParsingTreeNode* syntax_tree = Parse(&inputBuffer, readChars);
-    EvalTreeNode* eval_tree = et_create_node();
+    ParsingTreeNode *syntax_tree = Parse(&inputBuffer, readChars);
+    EvalTreeNode *eval_tree = et_create_node();
     Evaluate(eval_tree, syntax_tree);
+
+    //et_print_tree(eval_tree, 0);
 
     // Zero the input buffer
     memset(inputBuffer, 0, INPUT_BUFFER_SIZE * sizeof(char));
 
-    free_tree(syntax_tree);
-    et_free_tree(eval_tree);
+    //free_tree(syntax_tree);
+    //et_free_tree(eval_tree);
   }
 
   // Remember to free the buffer memory
@@ -65,4 +66,3 @@ int main(int argv, char **argc) {
 
   return 0;
 }
-

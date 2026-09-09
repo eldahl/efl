@@ -81,8 +81,8 @@ ParsingTreeNode *Parse(char **buffer, int BUFFER_SIZE) {
         // printf("%d - %d\n", i, lastDigit);
         // printf("digit buffer: %s\n", digitBuffer);
         // printf("number: %d\n", number);
-        printf("int: %d\n", int_number);
-        printf("doub: %f\n", doub_number);
+        //printf("int: %d\n", int_number);
+        //printf("doub: %f\n", doub_number);
 
         // LHS
         if (currentScope->arg_lhs.argument_type == ARGUMENT_TYPE_NULL) {
