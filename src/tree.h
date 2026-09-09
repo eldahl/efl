@@ -161,7 +161,7 @@ void add_child(ParsingTreeNode *parent, ParsingTreeNode *child) {
   if (parent->child_count >= parent->capacity) {
     int newCapacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
     ParsingTreeNode **temp = (ParsingTreeNode **)realloc(
-        parent->children, parent->capacity * sizeof(ParsingTreeNode *));
+        parent->children, newCapacity * sizeof(ParsingTreeNode *));
     if (!temp) {
       fprintf(stderr, "Error: Could not allocate memory.\n");
       return;

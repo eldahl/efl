@@ -67,7 +67,7 @@ void et_add_child(EvalTreeNode *parent, EvalTreeNode *child) {
   if (parent->child_count >= parent->capacity) {
     int newCapacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
     EvalTreeNode **temp = (EvalTreeNode **)realloc(
-        parent->children, parent->capacity * sizeof(EvalTreeNode *));
+        parent->children, newCapacity * sizeof(EvalTreeNode *));
     if (!temp) {
       fprintf(stderr, "Error: Could not allocate memory.\n");
       return;

@@ -55,6 +55,9 @@ int main(int argv, char **argc) {
 
     // Zero the input buffer
     memset(inputBuffer, 0, INPUT_BUFFER_SIZE * sizeof(char));
+
+    free_tree(syntax_tree);
+    et_free_tree(eval_tree);
   }
 
   // Remember to free the buffer memory
