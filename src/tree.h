@@ -139,9 +139,14 @@ void free_tree(ParsingTreeNode *root) {
   // Free the treenodes data and itself
   free(root->children);
 
+  // Statement
+  free(root->statement.statement_identifier);
+
   // Arguments
   free(root->arg_lhs.argument_data);
+  free(root->arg_lhs.argument_identifier);
   free(root->arg_rhs.argument_data);
+  free(root->arg_rhs.argument_identifier);
 
   free(root);
 }
@@ -154,13 +159,14 @@ void add_child(ParsingTreeNode *parent, ParsingTreeNode *child) {
 
   // When the array is full, expand its size
   if (parent->child_count >= parent->capacity) {
-    parent->capacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
+    int newCapacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
     ParsingTreeNode **temp = (ParsingTreeNode **)realloc(
         parent->children, parent->capacity * sizeof(ParsingTreeNode *));
     if (!temp) {
       fprintf(stderr, "Error: Could not allocate memory.\n");
       return;
     }
+    parent->capacity = newCapacity;
     parent->children = temp;
   }
 

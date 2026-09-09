@@ -30,6 +30,8 @@ EvalTreeNode *et_create_node() {
   new_node->arg_lhs = (Argument){-1, NULL, NULL};
   new_node->arg_rhs = (Argument){-1, NULL, NULL};
 
+  new_node->result = (Argument){-1, NULL, NULL};
+
   new_node->children = NULL;
   new_node->child_count = 0;
   new_node->capacity = 0;
@@ -50,9 +52,7 @@ void et_free_tree(EvalTreeNode *root) {
   // Free the treenodes data and itself
   free(root->children);
 
-  // Arguments
-  free(root->arg_lhs.argument_data);
-  free(root->arg_rhs.argument_data);
+  free(root->result.argument_data);
 
   free(root);
 }
@@ -65,13 +65,14 @@ void et_add_child(EvalTreeNode *parent, EvalTreeNode *child) {
 
   // When the array is full, expand its size
   if (parent->child_count >= parent->capacity) {
-    parent->capacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
+    int newCapacity = parent->capacity == 0 ? 2 : parent->capacity * 2;
     EvalTreeNode **temp = (EvalTreeNode **)realloc(
         parent->children, parent->capacity * sizeof(EvalTreeNode *));
     if (!temp) {
       fprintf(stderr, "Error: Could not allocate memory.\n");
       return;
     }
+    parent->capacity = newCapacity;
     parent->children = temp;
   }
 

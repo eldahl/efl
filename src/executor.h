@@ -26,7 +26,11 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
     et_add_child(evalTree, eNode);
     // Evaluate all children
     for (int i = 0; i < node->child_count; i++) {
-      Evaluate(evalTree, node->children[i]);
+      Evaluate(eNode, node->children[i]);
+    }
+
+    if (eNode->child_count > 0) {
+      eNode->result = eNode->children[eNode->child_count - 1]->result;
     }
   } else if (node->statement.statement_type == STATEMENT_TYPE_OPERATOR &&
              (node->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER ||
