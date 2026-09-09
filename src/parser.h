@@ -61,31 +61,57 @@ ParsingTreeNode *Parse(char **buffer, int BUFFER_SIZE) {
         int lastIdx = 0;
         int lastDigit = 0;
         char digitBuffer[1024];
-        for (int idx = 0; isdigit((*buffer)[i + idx]); idx++) {
+        int foundDecimal = 0;
+        for (int idx = 0;
+             isdigit((*buffer)[i + idx]) || ((*buffer)[i + idx]) == '.'; idx++) {
+          if ((*buffer)[i + idx] == '.' && !foundDecimal) {
+            foundDecimal = 1;
+          }
+
           digitBuffer[idx] = (*buffer)[i + idx];
           lastDigit = i + idx;
           lastIdx = idx;
         }
+
         // Add null termination to the char string so we can do atoi()
         digitBuffer[lastIdx + 1] = '\0';
 
-        int number = atoi(digitBuffer);
+        int int_number = atoi(digitBuffer);
+        double doub_number = strtod(digitBuffer, NULL);
         // printf("%d - %d\n", i, lastDigit);
         // printf("digit buffer: %s\n", digitBuffer);
         // printf("number: %d\n", number);
+        printf("int: %d\n", int_number);
+        printf("doub: %f\n", doub_number);
 
         // LHS
         if (currentScope->arg_lhs.argument_type == ARGUMENT_TYPE_NULL) {
-          currentScope->arg_lhs.argument_type = ARGUMENT_TYPE_NUMBER;
-          currentScope->arg_lhs.argument_identifier = "Number";
-          currentScope->arg_lhs.argument_data = argument_from_number(number);
+          if (foundDecimal) {
+            currentScope->arg_lhs.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
+            currentScope->arg_lhs.argument_identifier = "Double";
+            currentScope->arg_lhs.argument_data =
+                argument_from_double_number(doub_number);
+          } else {
+            currentScope->arg_lhs.argument_type = ARGUMENT_TYPE_INTEGER_NUMBER;
+            currentScope->arg_lhs.argument_identifier = "Integer";
+            currentScope->arg_lhs.argument_data =
+                argument_from_integer_number(int_number);
+          }
           currentScope->arg_lhs.argument_node = NULL;
         }
         // RHS
         else if (currentScope->arg_rhs.argument_type == ARGUMENT_TYPE_NULL) {
-          currentScope->arg_rhs.argument_type = ARGUMENT_TYPE_NUMBER;
-          currentScope->arg_rhs.argument_identifier = "Number";
-          currentScope->arg_rhs.argument_data = argument_from_number(number);
+          if (foundDecimal) {
+            currentScope->arg_rhs.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
+            currentScope->arg_rhs.argument_identifier = "Double";
+            currentScope->arg_rhs.argument_data =
+                argument_from_double_number(doub_number);
+          } else {
+            currentScope->arg_rhs.argument_type = ARGUMENT_TYPE_INTEGER_NUMBER;
+            currentScope->arg_rhs.argument_identifier = "Integer";
+            currentScope->arg_rhs.argument_data =
+                argument_from_integer_number(int_number);
+          }
           currentScope->arg_rhs.argument_node = NULL;
           // Stop looking for arguemtns when the RHS value has been found.
           currentScope->lookForArguments = 0;
