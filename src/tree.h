@@ -47,7 +47,7 @@ const int ARGUMENT_TYPE_FUNCTION = 3;
 
 typedef struct {
   int argument_type;
-  char *argument_data;
+  void *argument_data;
   char *argument_identifier;
   struct ParsingTreeNode *argument_node;
 } Argument;
@@ -67,8 +67,8 @@ typedef struct ParsingTreeNode {
   int lookForArguments;
 } ParsingTreeNode;
 
-char *argument_from_double_number(double _number) {
-  char *number = malloc(sizeof(double));
+void *argument_from_double_number(double _number) {
+  double *number = malloc(sizeof(double));
   if (number == NULL) {
     printf("failed to allocate memory for argument as number.\n");
     assert(number != NULL);
@@ -78,8 +78,8 @@ char *argument_from_double_number(double _number) {
   return number;
 }
 
-char *argument_from_integer_number(int _number) {
-  char *number = malloc(sizeof(int));
+void *argument_from_integer_number(int _number) {
+  int *number = malloc(sizeof(int));
   if (number == NULL) {
     printf("failed to allocate memory for argument as number.\n");
     assert(number != NULL);
@@ -89,7 +89,7 @@ char *argument_from_integer_number(int _number) {
   return number;
 }
 
-char *argument_from_string(char *_char_array, int _char_array_size) {
+void *argument_from_string(char *_char_array, int _char_array_size) {
   char *string = malloc(_char_array_size + 1);
   if (string == NULL) {
     printf("failed to allocate memory for argument as number.\n");
@@ -97,7 +97,7 @@ char *argument_from_string(char *_char_array, int _char_array_size) {
     return NULL;
   }
   memcpy(string, _char_array, _char_array_size);
-  strin [_char_array_size] = '\0';
+  string[_char_array_size] = '\0';
   return string;
 }
 

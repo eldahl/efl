@@ -42,14 +42,14 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
     int lhs_int = 0;
     int rhs_int = 0;
     if (node->arg_lhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
-      lhs_int = (int)*(node->arg_lhs.argument_data);
+      lhs_int = *(int *)(node->arg_lhs.argument_data);
     } else if (node->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
-      lhs_dou = (double)*(node->arg_lhs.argument_data);
+      lhs_dou = *(double *)(node->arg_lhs.argument_data);
     }
     if (node->arg_rhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
-      rhs_int = (int)*(node->arg_rhs.argument_data);
+      rhs_int = *(int *)(node->arg_rhs.argument_data);
     } else if (node->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
-      rhs_dou = (double)*(node->arg_rhs.argument_data);
+      rhs_dou = *(double *)(node->arg_rhs.argument_data);
     }
 
     if (node->statement.statement_sub_type == OPERATOR_TYPE_ADDITION) {
@@ -182,36 +182,36 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
         if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER ||
             eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
           if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
-            lhs_int = (int)*(node->arg_lhs.argument_data);
+            lhs_int = *(int *)(node->arg_lhs.argument_data);
           } else if (eNode->arg_lhs.argument_type ==
                      ARGUMENT_TYPE_DOUBLE_NUMBER) {
-            lhs_dou = (double)*(node->arg_lhs.argument_data);
+            lhs_dou = *(double *)(node->arg_lhs.argument_data);
           }
 
           if (eNode->children[0]->result.argument_type ==
               ARGUMENT_TYPE_INTEGER_NUMBER) {
-            rhs_int = (int)*(eNode->children[0]->result.argument_data);
+            rhs_int = *(int *)(eNode->children[0]->result.argument_data);
           } else if (eNode->children[0]->result.argument_type ==
                      ARGUMENT_TYPE_DOUBLE_NUMBER) {
-            rhs_dou = (double)*(eNode->children[0]->result.argument_data);
+            rhs_dou = *(double *)(eNode->children[0]->result.argument_data);
           }
         } else if (eNode->arg_rhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER ||
                    eNode->arg_rhs.argument_type ==
                        ARGUMENT_TYPE_DOUBLE_NUMBER) {
           if (node->arg_rhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
-            rhs_int = (int)*(node->arg_rhs.argument_data);
+            rhs_int = *(int *)(node->arg_rhs.argument_data);
           } else if (node->arg_rhs.argument_type ==
                      ARGUMENT_TYPE_DOUBLE_NUMBER) {
-            rhs_dou = (double)*(node->arg_rhs.argument_data);
+            rhs_dou = *(double *)(node->arg_rhs.argument_data);
           }
 
           if (eNode->children[0]->result.argument_type ==
               ARGUMENT_TYPE_INTEGER_NUMBER) {
-            lhs_int = (int)*(eNode->children[0]->result.argument_data);
+            lhs_int = *(int *)(eNode->children[0]->result.argument_data);
           } else if (eNode->children[0]->result.argument_type ==
                      ARGUMENT_TYPE_DOUBLE_NUMBER) {
-            lhs_dou = (double)*(eNode->children[0]->result.argument_data);
+            lhs_dou = *(double *)(eNode->children[0]->result.argument_data);
           }
         }
 
@@ -374,15 +374,19 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
       double rhs_dou = 0;
       int lhs_int = 0;
       int rhs_int = 0;
-      if (eNode->children[0]->result.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
-        lhs_int = (int)*(eNode->children[0]->result.argument_data);
-      } else if (eNode->children[0]->result.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
-        lhs_dou = (double)*(eNode->children[0]->result.argument_data);
+      if (eNode->children[0]->result.argument_type ==
+          ARGUMENT_TYPE_INTEGER_NUMBER) {
+        lhs_int = *(int *)(eNode->children[0]->result.argument_data);
+      } else if (eNode->children[0]->result.argument_type ==
+                 ARGUMENT_TYPE_DOUBLE_NUMBER) {
+        lhs_dou = *(double *)(eNode->children[0]->result.argument_data);
       }
-      if (eNode->children[1]->result.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
-        rhs_int = (int)*(eNode->children[1]->result.argument_data);
-      } else if (eNode->children[1]->result.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
-        rhs_dou = (double)*(eNode->children[1]->result.argument_data);
+      if (eNode->children[1]->result.argument_type ==
+          ARGUMENT_TYPE_INTEGER_NUMBER) {
+        rhs_int = *(int *)(eNode->children[1]->result.argument_data);
+      } else if (eNode->children[1]->result.argument_type ==
+                 ARGUMENT_TYPE_DOUBLE_NUMBER) {
+        rhs_dou = *(double *)(eNode->children[1]->result.argument_data);
       }
 
       if (eNode->statement.statement_sub_type == OPERATOR_TYPE_ADDITION) {
@@ -392,13 +396,16 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
               argument_from_integer_number(lhs_int + rhs_int);
           eNode->result.argument_type = ARGUMENT_TYPE_INTEGER_NUMBER;
           printf("%d + %d = %d\n", lhs_int, rhs_int, lhs_int + rhs_int);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_dou + rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%f + %f = %f\n", lhs_dou, rhs_dou, lhs_dou + rhs_dou);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
                    eNode->arg_rhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
@@ -407,26 +414,31 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
           printf("%f + %d = %f\n", lhs_dou, rhs_int, lhs_dou + rhs_int);
         } else if (eNode->arg_lhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_int + rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%d + %f = %f\n", lhs_int, rhs_dou, lhs_int + rhs_dou);
         }
-      } else if (eNode->statement.statement_sub_type == OPERATOR_TYPE_SUBTRACT) {
+      } else if (eNode->statement.statement_sub_type ==
+                 OPERATOR_TYPE_SUBTRACT) {
         if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER &&
             eNode->arg_rhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
               argument_from_integer_number(lhs_int - rhs_int);
           eNode->result.argument_type = ARGUMENT_TYPE_INTEGER_NUMBER;
           printf("%d - %d = %d\n", lhs_int, rhs_int, lhs_int - rhs_int);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_dou - rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%f - %f = %f\n", lhs_dou, rhs_dou, lhs_dou - rhs_dou);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
                    eNode->arg_rhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
@@ -435,26 +447,31 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
           printf("%f - %d = %f\n", lhs_dou, rhs_int, lhs_dou - rhs_int);
         } else if (eNode->arg_lhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_int - rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%d - %f = %f\n", lhs_int, rhs_dou, lhs_int - rhs_dou);
         }
-      } else if (eNode->statement.statement_sub_type == OPERATOR_TYPE_MULTIPLY) {
+      } else if (eNode->statement.statement_sub_type ==
+                 OPERATOR_TYPE_MULTIPLY) {
         if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER &&
             eNode->arg_rhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
               argument_from_integer_number(lhs_int * rhs_int);
           eNode->result.argument_type = ARGUMENT_TYPE_INTEGER_NUMBER;
           printf("%d * %d = %d\n", lhs_int, rhs_int, lhs_int * rhs_int);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_dou * rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%f * %f = %f\n", lhs_dou, rhs_dou, lhs_dou * rhs_dou);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
                    eNode->arg_rhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
@@ -463,26 +480,31 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
           printf("%f * %d = %f\n", lhs_dou, rhs_int, lhs_dou * rhs_int);
         } else if (eNode->arg_lhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_int * rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%d * %f = %f\n", lhs_int, rhs_dou, lhs_int * rhs_dou);
         }
-      } else if (eNode->statement.statement_sub_type == OPERATOR_TYPE_DIVISION) {
+      } else if (eNode->statement.statement_sub_type ==
+                 OPERATOR_TYPE_DIVISION) {
         if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER &&
             eNode->arg_rhs.argument_type == ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
               argument_from_integer_number(lhs_int / rhs_int);
           eNode->result.argument_type = ARGUMENT_TYPE_INTEGER_NUMBER;
           printf("%d / %d = %d\n", lhs_int, rhs_int, lhs_int / rhs_int);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_dou / rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
           printf("%f / %f = %f\n", lhs_dou, rhs_dou, lhs_dou / rhs_dou);
-        } else if (eNode->arg_lhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER &&
+        } else if (eNode->arg_lhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER &&
                    eNode->arg_rhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER) {
           eNode->result.argument_data =
@@ -491,7 +513,8 @@ void Evaluate(EvalTreeNode *evalTree, ParsingTreeNode *node) {
           printf("%f / %d = %f\n", lhs_dou, rhs_int, lhs_dou / rhs_int);
         } else if (eNode->arg_lhs.argument_type ==
                        ARGUMENT_TYPE_INTEGER_NUMBER &&
-                   eNode->arg_rhs.argument_type == ARGUMENT_TYPE_DOUBLE_NUMBER) {
+                   eNode->arg_rhs.argument_type ==
+                       ARGUMENT_TYPE_DOUBLE_NUMBER) {
           eNode->result.argument_data =
               argument_from_double_number(lhs_int / rhs_dou);
           eNode->result.argument_type = ARGUMENT_TYPE_DOUBLE_NUMBER;
